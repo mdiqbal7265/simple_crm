@@ -6,7 +6,7 @@ require_once 'classes/Validation.php';
 require_once 'classes/MysqliDb.php';
 require_once 'classes/Helper.php';
 
-$db = new MysqliDb('localhost', 'root', '', 'cms_db');
+$db = new MysqliDb('localhost', 'root', '', 'crm');
 $validation = new Validation();
 $helper = new Helper();
 
@@ -20,7 +20,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'login') {
 
     if ($validation->isSuccess()) {
         $db->where('email', $email);
-        $loggedIn = $db->getOne('users');
+        $loggedIn = $db->getOne('user');
         if ($loggedIn != null) {
             if (password_verify($password, $loggedIn['password'])) {
                 if (!empty($_POST['rem'])) {
