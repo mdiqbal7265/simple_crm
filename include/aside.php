@@ -40,6 +40,24 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a href="users.php" class="nav-link">
+                                <i class="nav-icon fa fa-users"></i>
+                                <p>Users</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="service.php" class="nav-link">
+                                <i class="nav-icon fa fa-bars"></i>
+                                <p>Service</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="request_quote.php" class="nav-link">
+                                <i class="nav-icon fa fa-quote-left"></i>
+                                <p>Request a Quote</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="#" class="nav-link" id="logout">
                                 <i class="nav-icon fa fa-sign-out-alt"></i>
                                 <p>Logout</p>
