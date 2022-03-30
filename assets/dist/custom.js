@@ -1,4 +1,5 @@
 $(document).ready(function() {
+  var spinner = $("#loader");
   // toaster
   var Toast = Swal.mixin({
     toast: true,
@@ -285,5 +286,227 @@ $(document).ready(function() {
     e.preventDefault();
     id = $(this).attr("id");
     deleteData("dltService", id, fetchService);
+  });
+
+  // Request a Quote
+  $("#request_quote_btn").click(function(e) {
+    e.preventDefault();
+    $("#request_quote_btn").val("Please wait...");
+    $.ajax({
+      type: "POST",
+      url: "lib/action.php",
+      data: $("#request_quote_form").serialize() + "&action=request_quote",
+      success: function(response) {
+        $("#request_quote_btn").val("Request Quote");
+        $("#request_quote_form")[0].reset();
+        if (response == "success") {
+          Toast.fire({
+            icon: "success",
+            title:
+              "Your Request sent successfully. We will reply soon in your registered email!"
+          });
+        } else if (response == "error") {
+          Toast.fire({
+            icon: "error",
+            title: "Something went wrong. Please try again!"
+          });
+        } else {
+          $("#error").show();
+          $("#error").html(response);
+        }
+      }
+    });
+  });
+
+  // Fetch Ticket
+  fetchTicket();
+  function fetchTicket() {
+    $.ajax({
+      type: "POST",
+      url: "lib/action.php",
+      data: { action: "fetchTicket" },
+      success: function(response) {
+        $("#ticket_list_body").html(response);
+        datatable("#ticket_list_table");
+      }
+    });
+  }
+
+  // Add Ticket
+  $("#add_ticket_btn").click(function(e) {
+    e.preventDefault();
+    $("#add_ticket_btn").val("Please wait...");
+    $.ajax({
+      type: "POST",
+      url: "lib/action.php",
+      data: $("#add_ticket_form").serialize() + "&action=add_ticket",
+      success: function(response) {
+        $("#add_ticket_btn").val("Request Quote");
+        $("#add_ticket_form")[0].reset();
+        if (response == "success") {
+          $("#add_ticket_modal").modal("hide");
+          Toast.fire({
+            icon: "success",
+            title: "Your Ticket sent successfully. We will reply soon!"
+          });
+        } else if (response == "error") {
+          $("#add_ticket_modal").modal("hide");
+          Toast.fire({
+            icon: "error",
+            title: "Something went wrong. Please try again!"
+          });
+        } else {
+          $("#error").show();
+          $("#error").html(response);
+        }
+
+        fetchTicket();
+      }
+    });
+  });
+
+  // Fetch Manage Ticket For Admin
+  fetchTicketForManage();
+  function fetchTicketForManage() {
+    $.ajax({
+      type: "POST",
+      url: "lib/action.php",
+      data: { action: "fetchTicketForManage" },
+      success: function(response) {
+        $("#ticket_manage_body").html(response);
+        datatable("#ticket_manage_table");
+      }
+    });
+  }
+
+  // Admin Remark Ticket
+  $("body").on("click", ".remarkTicket", function(e) {
+    e.preventDefault();
+    id = $(this).attr("id");
+    $("#ticket_id").val(id);
+  });
+
+  // Admin Remark Ticket By Id
+  $("#remark_ticket_btn").click(function(e) {
+    e.preventDefault();
+    $("#remark_ticket_btn").val("Please wait...");
+    $.ajax({
+      type: "POST",
+      url: "lib/action.php",
+      data: $("#remark_ticket_form").serialize() + "&action=remark_ticket",
+      success: function(response) {
+        $("#remark_ticket_btn").val("Request Quote");
+        $("#remark_ticket_form")[0].reset();
+        if (response == "success") {
+          $("#reply_ticket_modal").modal("hide");
+          Toast.fire({
+            icon: "success",
+            title: "Ticket Remark successfully..!"
+          });
+        } else if (response == "error") {
+          $("#reply_ticket_modal").modal("hide");
+          Toast.fire({
+            icon: "error",
+            title: "Something went wrong. Please try again!"
+          });
+        } else {
+          $("#error").show();
+          $("#error").html(response);
+        }
+
+        fetchTicketForManage();
+        // console.log(response);
+      }
+    });
+  });
+
+  // Fetch quote for manage by admin
+  fetchQuoteForManage();
+  function fetchQuoteForManage() {
+    $.ajax({
+      type: "POST",
+      url: "lib/action.php",
+      data: { action: "fetchQuoteForManage" },
+      success: function(response) {
+        $("#quote_manage_body").html(response);
+        datatable("#quote_manage_table");
+      }
+    });
+  }
+
+  // View Quote
+  $("body").on("click", ".viewQuote", function(e) {
+    e.preventDefault();
+    id = $(this).attr("id");
+    $.ajax({
+      type: "POSt",
+      url: "lib/action.php",
+      data: { action: "viewQuote", id: id },
+      success: function(response) {
+        data = JSON.parse(response);
+        // $("#service_id").val(data.id);
+        $("#name").text(data.name);
+        $("#email").text(data.email);
+        $("#contact").text(data.contactno);
+        $("#company").text(data.company);
+        $("#service").text(data.service_id);
+        $("#query").text(data.query);
+        $("#date").text(data.posting_date);
+        $("#id").val(data.id);
+        $("#email_id").val(data.email);
+        // console.log(data);
+      }
+    });
+  });
+
+  // Admin Remark Quote By Id
+  $("#admin_remark_btn").click(function(e) {
+    e.preventDefault();
+    $("#admin_remark_btn").val("Please wait...");
+    spinner.show();
+    $.ajax({
+      type: "POST",
+      url: "lib/action.php",
+      data: $("#admin_remark_form").serialize() + "&action=remark_quote",
+      success: function(response) {
+        $("#admin_remark_btn").val("Request Quote");
+        $("#admin_remark_form")[0].reset();
+        if (response == "success") {
+          $("#manage_quote_modal").modal("hide");
+          Toast.fire({
+            icon: "success",
+            title: "Quote Remark successfully..!"
+          });
+        } else if (response == "error") {
+          $("#manage_quote_modal").modal("hide");
+          Toast.fire({
+            icon: "error",
+            title: "Something went wrong. Please try again!"
+          });
+        } else {
+          $("#error").show();
+          $("#error").html(response);
+        }
+        spinner.hide();
+        fetchQuoteForManage();
+        // console.log(response);
+      }
+    });
+  });
+
+  // View Remark Ticket
+  $("body").on("click", ".viewRemarkTicket", function(e) {
+    e.preventDefault();
+    id = $(this).attr("id");
+    $.ajax({
+      type: "POSt",
+      url: "lib/action.php",
+      data: { action: "viewRemarkTicket", id: id },
+      success: function(response) {
+        data = JSON.parse(response);
+        $("#remark_ticket").text(data.admin_remark);
+        $("#remark_date").text(data.admin_remark_date);
+      }
+    });
   });
 });

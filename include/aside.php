@@ -39,24 +39,47 @@
                                 <p>Dashboard</p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="users.php" class="nav-link">
-                                <i class="nav-icon fa fa-users"></i>
-                                <p>Users</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="service.php" class="nav-link">
-                                <i class="nav-icon fa fa-bars"></i>
-                                <p>Service</p>
-                            </a>
-                        </li>
+                        <?php if ($user['type'] == 1) : ?>
+                            <li class="nav-item">
+                                <a href="users.php" class="nav-link">
+                                    <i class="nav-icon fa fa-users"></i>
+                                    <p>Users</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="service.php" class="nav-link">
+                                    <i class="nav-icon fa fa-bars"></i>
+                                    <p>Service</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="manage_quote.php" class="nav-link">
+                                    <i class="nav-icon fa fa-quote-left"></i>
+                                    <p>Manage Quote</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="manage_ticket.php" class="nav-link">
+                                    <i class="nav-icon fa fa-ticket-alt"></i>
+                                    <p>Manage Ticket</p>
+                                </a>
+                            </li>
+                        <?php endif; ?>
+                        <?php if ($user['type'] == 0) : ?>
                         <li class="nav-item">
                             <a href="request_quote.php" class="nav-link">
                                 <i class="nav-icon fa fa-quote-left"></i>
                                 <p>Request a Quote</p>
                             </a>
                         </li>
+
+                        <li class="nav-item">
+                            <a href="ticket.php" class="nav-link">
+                                <i class="nav-icon fa fa-ticket-alt"></i>
+                                <p>View Ticket</p>
+                            </a>
+                        </li>
+                        <?php endif; ?>
                         <li class="nav-item">
                             <a href="#" class="nav-link" id="logout">
                                 <i class="nav-icon fa fa-sign-out-alt"></i>

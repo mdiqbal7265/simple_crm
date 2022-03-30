@@ -1,7 +1,7 @@
 <?php
 
 session_start();
-if(isset($_SESSION['email'])){
+if (isset($_SESSION['email'])) {
   header('location: dashboard.php');
 }
 
@@ -24,11 +24,25 @@ if(isset($_SESSION['email'])){
   <link rel="stylesheet" href="assets/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="assets/dist/css/adminlte.min.css">
+  <style type="text/css">
+    #loader {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.75) url(assets/dist/preloader.gif) no-repeat center center;
+      z-index: 10000;
+    }
+  </style>
 </head>
 
 <body class="hold-transition login-page">
   <div class="login-box">
     <!-- /.login-logo -->
+
     <div class="card card-outline card-primary">
       <div class="card-header text-center">
         <a href="index.php" class="h1"><b>CUSTOMER</b>RM</a>
@@ -75,13 +89,76 @@ if(isset($_SESSION['email'])){
             <!-- /.col -->
           </div>
         </form>
+        <p class="mb-1">
+          <a href="forgot-password.html">I forgot my password</a>
+        </p>
+        <p class="mb-0">
+          <a href="#" class="text-center" id="register">Register a new membership</a>
+        </p>
       </div>
       <!-- /.card-body -->
     </div>
-    <!-- /.card -->
+
   </div>
   <!-- /.login-box -->
 
+  <!-- Register Box -->
+  <div class="register-box" style="display: none;">
+    <div class="card card-outline card-primary">
+      <div class="card-header text-center">
+        <a href="index.php" class="h1"><b>CUSTOMER</b>RM</a>
+      </div>
+      <div class="card-body">
+        <p class="login-box-msg">Register a new membership</p>
+
+        <form action="" method="post" id="register_form">
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Full name" name="name">
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-user"></span>
+              </div>
+            </div>
+          </div>
+          <div class="input-group mb-3">
+            <input type="email" class="form-control" placeholder="Email" name="email">
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-envelope"></span>
+              </div>
+            </div>
+          </div>
+          <div class="input-group mb-3">
+            <input type="password" class="form-control" placeholder="Password" name="password">
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-lock"></span>
+              </div>
+            </div>
+          </div>
+          <div class="input-group mb-3">
+            <input type="password" class="form-control" placeholder="Retype password" name="confirm_password">
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-lock"></span>
+              </div>
+            </div>
+          </div>
+          <!-- /.col -->
+          <div class="col-4">
+            <button type="submit" class="btn btn-primary btn-block" id="register_btn">Register</button>
+          </div>
+          <!-- /.col -->
+      </div>
+      </form>
+
+      <a href="#" class="text-center" id="login">I already have a membership</a>
+    </div>
+    <!-- /.form-box -->
+  </div><!-- /.card -->
+  </div>
+  <!-- /.register-box -->
+  <div id="loader"></div>
   <!-- jQuery -->
   <script src="assets/plugins/jquery/jquery.min.js"></script>
   <!-- Bootstrap 4 -->
@@ -91,6 +168,24 @@ if(isset($_SESSION['email'])){
   <!-- AdminLTE App -->
   <script src="assets/dist/js/adminlte.min.js"></script>
   <script>
+    $("#register").click(function(e) {
+      e.preventDefault();
+      $("#loader").show();
+      $(".login-box").hide();
+      $(".register-box").show();
+      setTimeout(() => {
+        $("#loader").hide();
+      }, 1000);
+    });
+    $("#login").click(function(e) {
+      e.preventDefault();
+      $("#loader").show();
+      $(".login-box").show();
+      $(".register-box").hide();
+      setTimeout(() => {
+        $("#loader").hide();
+      }, 1000);
+    });
     /***** Admin Login Button */
     $(function() {
       var Toast = Swal.mixin({
@@ -137,6 +232,46 @@ if(isset($_SESSION['email'])){
           }
         });
       });
+
+      $("#register_btn").click(function(e) {
+        e.preventDefault();
+        $("#register_btn").val('Please Wait...');
+        $.ajax({
+          type: "POST",
+          url: "lib/action.php",
+          data: $("#register_form").serialize() + '&action=register',
+          success: function(response) {
+            $("#register_btn").val("Register");
+            $("#register_form")[0].reset()
+            if (response == "login") {
+              $("#error").hide();
+              Toast.fire({
+                icon: 'success',
+                title: 'Login Successfully. Please Wait. We will redirect you to dashboard!'
+              });
+              setTimeout(() => {
+                window.location = 'dashboard.php';
+              }, 2000);
+            } else if (response == 'password_not_matched') {
+              $("#error").hide();
+              Toast.fire({
+                icon: 'error',
+                title: 'Password didn\'t match. Please try again!'
+              });
+            } else if (response == 'data_not_found') {
+              $("#error").hide();
+              Toast.fire({
+                icon: 'error',
+                title: 'Your Email Address not found in our database!'
+              });
+            } else {
+              $("#error").show();
+              $("#error").html(response);
+            }
+          }
+        });
+      });
+
     });
   </script>
 </body>

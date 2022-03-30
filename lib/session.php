@@ -16,3 +16,5 @@ if (!isset($_SESSION['email'])) {
 $email = $_SESSION['email'];
 $db->where('email', $email);
 $user = $db->getOne('user');
+
+$service = $db->get('service');

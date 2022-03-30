@@ -32,9 +32,23 @@
     <link rel="stylesheet" href="assets/plugins/bootstrap4-toggle/css/bootstrap4-toggle.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="assets/dist/css/adminlte.min.css">
+    <style type="text/css">
+        #loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.75) url(assets/dist/preloader.gif) no-repeat center center;
+            z-index: 10000;
+        }
+    </style>
 </head>
 
 <body class="hold-transition sidebar-mini">
+    <div id="loader"></div>
     <div class="wrapper">
 
         <!-- Navbar -->
