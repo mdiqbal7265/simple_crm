@@ -129,7 +129,7 @@ if (isset($_SESSION['email'])) {
             </div>
           </div>
           <div class="input-group mb-3">
-            <input type="password" class="form-control" placeholder="Password" name="password">
+            <input type="password" class="form-control" id="password" placeholder="Password" name="password">
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-lock"></span>
@@ -137,18 +137,30 @@ if (isset($_SESSION['email'])) {
             </div>
           </div>
           <div class="input-group mb-3">
-            <input type="password" class="form-control" placeholder="Retype password" name="confirm_password">
+            <input type="password" class="form-control" id="confirm_password" placeholder="Retype password" name="confirm_password">
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-lock"></span>
               </div>
             </div>
           </div>
-          <!-- /.col -->
-          <div class="col-4">
-            <button type="submit" class="btn btn-primary btn-block" id="register_btn">Register</button>
+          <p class="text-danger font-weight-bold" id="passErr"></p>
+          <div class="row">
+            <div class="col-8">
+              <div class="icheck-primary">
+                <input type="checkbox" id="agreeTerms" name="terms" value="agree">
+                <label for="agreeTerms">
+                  I agree to the <a href="#">terms</a>
+                </label>
+              </div>
+            </div>
+            <!-- /.col -->
+            <div class="col-4">
+              <input type="submit" value="Register" class="btn btn-primary btn-block" id="register_btn">
+              <!-- <button type="submit" class="btn btn-primary btn-block" id="register_btn">Register</button> -->
+            </div>
+            <!-- /.col -->
           </div>
-          <!-- /.col -->
       </div>
       </form>
 
@@ -236,40 +248,48 @@ if (isset($_SESSION['email'])) {
       $("#register_btn").click(function(e) {
         e.preventDefault();
         $("#register_btn").val('Please Wait...');
-        $.ajax({
-          type: "POST",
-          url: "lib/action.php",
-          data: $("#register_form").serialize() + '&action=register',
-          success: function(response) {
-            $("#register_btn").val("Register");
-            $("#register_form")[0].reset()
-            if (response == "login") {
-              $("#error").hide();
-              Toast.fire({
-                icon: 'success',
-                title: 'Login Successfully. Please Wait. We will redirect you to dashboard!'
-              });
-              setTimeout(() => {
-                window.location = 'dashboard.php';
-              }, 2000);
-            } else if (response == 'password_not_matched') {
-              $("#error").hide();
-              Toast.fire({
-                icon: 'error',
-                title: 'Password didn\'t match. Please try again!'
-              });
-            } else if (response == 'data_not_found') {
-              $("#error").hide();
-              Toast.fire({
-                icon: 'error',
-                title: 'Your Email Address not found in our database!'
-              });
-            } else {
-              $("#error").show();
-              $("#error").html(response);
+        if ($("#password").val() != $("#confirm_password").val()) {
+          $("#passErr").text("Password and Confirm Password Don't match..!");
+          $("#register_btn").val('Please Wait...');
+        } else {
+          $.ajax({
+            type: "POST",
+            url: "lib/action.php",
+            data: $("#register_form").serialize() + '&action=register',
+            success: function(response) {
+              $("#register_btn").val("Register");
+              $("#register_form")[0].reset()
+              if (response == "register") {
+                $("#error").hide();
+                Toast.fire({
+                  icon: 'success',
+                  title: 'Register Successfully. Please Wait. We will redirect you to dashboard!'
+                });
+                setTimeout(() => {
+                  window.location = 'dashboard.php';
+                }, 2000);
+              } else if (response == 'something_wrong') {
+                $("#error").hide();
+                Toast.fire({
+                  icon: 'error',
+                  title: 'Something Went Wrong. Please try again!'
+                });
+              } else if (response == 'user_exists') {
+                $("#error").hide();
+                Toast.fire({
+                  icon: 'error',
+                  title: 'Your Email Address find in our database. Please try with another email!'
+                });
+              } else {
+                $("#error").show();
+                $("#error").html(response);
+              }
+
+              // console.log(response);
             }
-          }
-        });
+          });
+        }
+
       });
 
     });

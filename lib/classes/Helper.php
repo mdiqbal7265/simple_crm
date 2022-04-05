@@ -6,6 +6,8 @@ use PHPMailer\PHPMailer\Exception;
 
 //Load Composer's autoloader
 require __DIR__.'/../vendor/autoload.php';
+// require 'MysqliDb.php';
+$db = new MysqliDb('localhost', 'root', '', 'crm');
 
 //Create an instance; passing `true` enables exceptions
 $instance_mail = new PHPMailer(true);
@@ -15,11 +17,14 @@ class Helper
 
     public $title;
     public $mail;
+    public $conn;
 
     public function __construct()
     {
         global $instance_mail;
+        global $db;
         $this->mail = $instance_mail;
+        $this->conn = $db;
     }
 
 
@@ -113,5 +118,12 @@ class Helper
         } catch (PDOException $e) {
             echo "Message could not be sent. Mailer Error: {$this->mail->ErrorInfo}";
         }
+    }
+
+    // User Exists Check
+    public function user_exists($email){
+        $this->conn->where('email', $email);
+        $result = $this->conn->getOne('user');
+        return $result;
     }
 }

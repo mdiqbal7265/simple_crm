@@ -1,4 +1,5 @@
 <?php include 'include/header.php'; ?>
+<?php if($user['type'] == 2){header('Location:error.php');} ?>
 
 <?php include 'include/aside.php'; ?>
 

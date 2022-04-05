@@ -120,9 +120,7 @@ $(document).ready(function() {
         $("#userEmail").text(data.email);
         $("#user_alt_email").text(data.alt_email);
         $("#userMobile").text(data.mobile);
-        data.gender == "m"
-          ? $("#userGender").text("Male")
-          : $("#userGender").text("Female");
+        $("#userGender").text(data.gender);
         $("#userAddress").text(data.address);
         data.status == "1"
           ? $("#userStatus").html(
@@ -506,6 +504,75 @@ $(document).ready(function() {
         data = JSON.parse(response);
         $("#remark_ticket").text(data.admin_remark);
         $("#remark_date").text(data.admin_remark_date);
+      }
+    });
+  });
+
+  // Update Profile
+  $("#update_profile_btn").click(function(e) {
+    e.preventDefault();
+    $("#update_profile_btn").val("Please Wait...");
+    $.ajax({
+      type: "POST",
+      url: "lib/action.php",
+      data: $("#update_profile_form").serialize() + "&action=update_profile",
+      success: function(response) {
+        $("#update_profile_btn").val("Update");
+        if (response == "success") {
+          Toast.fire({
+            icon: "success",
+            title: "Profile Updated successfully..!"
+          });
+        } else if (response == "error") {
+          Toast.fire({
+            icon: "error",
+            title: "Something went wrong. Please try again!"
+          });
+        } else {
+          $("#error").show();
+          $("#error").html(response);
+        }
+      }
+    });
+  });
+
+  // Change Password
+  $("#change_password_btn").click(function(e) {
+    e.preventDefault();
+    $("#change_password_btn").val("Please Wait...");
+    if ($("#password").val() != $("#confirm_password").val()) {
+      Toast.fire({
+        icon: "error",
+        title: "Password and Confirm Password Doesn't matched. Please try again!"
+      });
+    }
+    $.ajax({
+      type: "POST",
+      url: "lib/action.php",
+      data: $("#change_password_form").serialize() + "&action=change_pass",
+      success: function(response) {
+        $("#change_password_btn").val("Change Password");
+        $("#change_password_form")[0].reset();
+        if (response == "success") {
+          Toast.fire({
+            icon: "success",
+            title: "Password Changed successfully..!"
+          });
+        } else if (response == "old_password_wrong") {
+          Toast.fire({
+            icon: "error",
+            title:
+              "Old Password Doesn't matched In Our Database. Please try again!"
+          });
+        } else if (response == "error") {
+          Toast.fire({
+            icon: "error",
+            title: "Something went wrong. Please try again!"
+          });
+        } else {
+          $("#error").show();
+          $("#error").html(response);
+        }
       }
     });
   });

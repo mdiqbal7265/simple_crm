@@ -17,6 +17,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'login') {
 
     $validation->name('email')->value($email)->pattern('email')->required();
     $validation->name('password')->value($password)->required();
+    
 
     if ($validation->isSuccess()) {
         $db->where('email', $email);
@@ -30,6 +31,23 @@ if (isset($_POST['action']) && $_POST['action'] == 'login') {
                     setcookie("email", "", 1, '/');
                     setcookie("password", "", 1, '/');
                 }
+                $IP = $_SERVER['REMOTE_ADDR'];
+                $MAC = exec('getmac');
+                $MAC = strtok($MAC, ' ');
+                $id = $loggedIn['id'];
+                $username = $loggedIn['name'];
+                $date = date('Y/m/d');
+                $time = time();
+                $data = [
+                    'logindate' => $date,
+                    'logintime' => $time,
+                    'user_id' => $id,
+                    'username' => $username,
+                    'email' => $email,
+                    'ip' => $IP,
+                    'mac' => $MAC,
+                ];
+                $db->insert('usercheck',$data);
                 echo 'login';
                 $_SESSION['email'] = $email;
             } else {
@@ -37,6 +55,41 @@ if (isset($_POST['action']) && $_POST['action'] == 'login') {
             }
         } else {
             echo 'data_not_found';
+        }
+    } else {
+        echo "Validation Error!";
+        echo $validation->displayErrors();
+    }
+}
+
+// Handle User Registration
+if (isset($_POST['action']) && $_POST['action'] == 'register') {
+    $name = $validation->sanitize_data($_POST['name']);
+    $email = $validation->sanitize_data($_POST['email']);
+    $password = $validation->sanitize_data($_POST['password']);
+
+    $validation->name('name')->value($name)->required();
+    $validation->name('email')->value($email)->pattern('email')->required();
+    $validation->name('password')->value($password)->required();
+
+    $_password = password_hash($password, PASSWORD_BCRYPT);
+
+    if ($validation->isSuccess()) {
+        if ($helper->user_exists($email)) {
+            echo 'user_exists';
+        } else {
+            $data = [
+                'name' => $name,
+                'email' => $email,
+                'password' => $_password
+            ];
+
+            if ($db->insert('user', $data)) {
+                echo 'register';
+                $_SESSION['email'] = $email;
+            } else {
+                'something_wrong';
+            }
         }
     } else {
         echo "Validation Error!";
@@ -63,7 +116,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'fetchUser') {
                 <td>{$value['name']}</td>
                 <td>{$value['email']}</td>
                 <td>{$value['mobile']} </td>
-                <td>" . ($value['gender'] == 'm' ? 'Male' : 'Female') . "</td>
+                <td>" . $value['gender'] . "</td>
                 <td>" . date("d M Y, H:i A", strtotime($value['posting_date'])) . "</td>
                 <td>
                     <a href='#' id='{$value['id']}' class='btn btn-info btn-sm viewUser' data-toggle='modal' data-target='#view_user_modal'><i class='fa fa-info-circle'></i></a>
@@ -258,7 +311,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'fetchTicket') {
                 <td>{$value['prioprity']}</td>
                 <td>{$value['ticket']}</td>
                 <td>" . ($value['status'] == 1 ? "<span class='badge badge-success'>Closed</span>" : "<span class='badge badge-danger'>Pending</span>") . "</td>
-                <td> ".($value['status'] == 1 ? "<a href='#' id='{$value['id']}' class='btn btn-primary btn-sm viewRemarkTicket' data-toggle='modal' data-target='#view_ticket_modal'><i class='fa fa-eye'></i></a>" : "<span class='badge badge-danger'>Ticket Not Resolved</span>")."
+                <td> " . ($value['status'] == 1 ? "<a href='#' id='{$value['id']}' class='btn btn-primary btn-sm viewRemarkTicket' data-toggle='modal' data-target='#view_ticket_modal'><i class='fa fa-eye'></i></a>" : "<span class='badge badge-danger'>Ticket Not Resolved</span>") . "
                     
                 </td>
             </tr>";
@@ -432,4 +485,72 @@ if (isset($_POST['action']) && $_POST['action'] == 'viewRemarkTicket') {
     $data = $db->getOne("ticket");
 
     echo json_encode($data);
+}
+
+
+// Update Profile By Ajax Request
+if (isset($_POST['action']) && $_POST['action'] == 'update_profile') {
+    $id = $_POST['id'];
+    $name = $validation->sanitize_data($_POST['name']);
+    $email = $validation->sanitize_data($_POST['email']);
+    $alt_email = $validation->sanitize_data($_POST['alt_email']);
+    $mobile = $validation->sanitize_data($_POST['mobile']);
+    $address = $validation->sanitize_data($_POST['address']);
+    $gender = $validation->sanitize_data($_POST['gender']);
+
+    $validation->name('name')->value($name)->required();
+    $validation->name('email')->value($email)->pattern('email')->required();
+    $validation->name('alt_email')->value($alt_email)->pattern('email');
+
+    if ($validation->isSuccess()) {
+        $data = [
+            'name' => $name,
+            'email' => $email,
+            'alt_email' => $alt_email,
+            'mobile' => $mobile,
+            'address' => $address,
+            'gender' => $gender
+        ];
+        $db->where('id', $id);
+        if ($db->update('user', $data)) {
+            echo 'success';
+        } else {
+            echo 'error';
+        }
+    } else {
+        echo "Validation Error!";
+        echo $validation->displayErrors();
+    }
+}
+
+// Change Password
+if (isset($_POST['action']) && $_POST['action'] == 'change_pass') {
+    $id = $_POST['user_id'];
+    $old_password = $validation->sanitize_data($_POST['old_password']);
+    $new_password = $validation->sanitize_data($_POST['new_password']);
+    $validation->name('old_password')->value($old_password)->required();
+    $validation->name('new_password')->value($new_password)->required();
+    $db->where('id', $id);
+    $user = $db->getOne('user');
+    $_password = $user['password'];
+    $_new_password = password_hash($new_password, PASSWORD_BCRYPT);
+
+    if ($validation->isSuccess()) {
+        if (password_verify($old_password, $_password)) {
+            $data = [
+                'password' => $_new_password
+            ];
+            $db->where('id', $id);
+            if ($db->update('user', $data)) {
+                echo 'success';
+            } else {
+                echo 'error';
+            }
+        }else{
+            echo 'old_password_wrong';
+        }
+    } else {
+        echo "Validation Error!";
+        echo $validation->displayErrors();
+    }
 }

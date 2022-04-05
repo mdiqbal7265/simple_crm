@@ -1,7 +1,7 @@
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <!-- Brand Logo -->
-            <a href="index3.html" class="brand-link">
+            <a href="dashboard.php" class="brand-link">
                 <img src="assets/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                 <span class="brand-text font-weight-light">Dashboard</span>
             </a>
@@ -39,42 +39,48 @@
                                 <p>Dashboard</p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="profile.php" class="nav-link <?= (basename($_SERVER['PHP_SELF']) == "profile.php") ? "active" : ""; ?>">
+                                <i class="nav-icon fas fa-user"></i>
+                                <p>Profile</p>
+                            </a>
+                        </li>
                         <?php if ($user['type'] == 1) : ?>
                             <li class="nav-item">
-                                <a href="users.php" class="nav-link">
+                                <a href="users.php" class="nav-link <?= (basename($_SERVER['PHP_SELF']) == "users.php") ? "active" : ""; ?>">
                                     <i class="nav-icon fa fa-users"></i>
                                     <p>Users</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="service.php" class="nav-link">
+                                <a href="service.php" class="nav-link <?= (basename($_SERVER['PHP_SELF']) == "service.php") ? "active" : ""; ?>">
                                     <i class="nav-icon fa fa-bars"></i>
                                     <p>Service</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="manage_quote.php" class="nav-link">
+                                <a href="manage_quote.php" class="nav-link <?= (basename($_SERVER['PHP_SELF']) == "manage_quote.php") ? "active" : ""; ?>">
                                     <i class="nav-icon fa fa-quote-left"></i>
                                     <p>Manage Quote</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="manage_ticket.php" class="nav-link">
+                                <a href="manage_ticket.php" class="nav-link <?= (basename($_SERVER['PHP_SELF']) == "manage_ticket.php") ? "active" : ""; ?>">
                                     <i class="nav-icon fa fa-ticket-alt"></i>
                                     <p>Manage Ticket</p>
                                 </a>
                             </li>
                         <?php endif; ?>
-                        <?php if ($user['type'] == 0) : ?>
+                        <?php if ($user['type'] == 2) : ?>
                         <li class="nav-item">
-                            <a href="request_quote.php" class="nav-link">
+                            <a href="request_quote.php" class="nav-link <?= (basename($_SERVER['PHP_SELF']) == "request_quote.php") ? "active" : ""; ?>">
                                 <i class="nav-icon fa fa-quote-left"></i>
                                 <p>Request a Quote</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="ticket.php" class="nav-link">
+                            <a href="ticket.php" class="nav-link <?= (basename($_SERVER['PHP_SELF']) == "ticket.php") ? "active" : ""; ?>">
                                 <i class="nav-icon fa fa-ticket-alt"></i>
                                 <p>View Ticket</p>
                             </a>
